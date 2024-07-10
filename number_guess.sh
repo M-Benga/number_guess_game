@@ -23,7 +23,7 @@ BEST_GAME=$($PSQL "SELECT best_game FROM users WHERE username = '$userName'")
  fi
 # We produce a random number btn 0 and 1000
 randomNumber=$((RANDOM % 1000 + 1))
-#echo "The random number between 1 and 1000 is: $randomNumber"
+
 
 #random_number=$(awk -v min=1 -v max=1000 'BEGIN{srand(); print int(min + rand()*(max-min+1))}')
 
@@ -49,7 +49,6 @@ fi
 read guessedNumber
 
  numberOfGuesses=$(( numberOfGuesses + 1 ))
-#echo "You have guessed $numberOfGuesses times." 
 
 done
 
