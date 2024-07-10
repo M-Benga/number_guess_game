@@ -5,6 +5,22 @@ PSQL="psql --username=freecodecamp --dbname=number_guess -t --no-align -c"
 echo "Enter your username:"
 read userName
 
+# Check if username exist in database
+USERNAME=$($PSQL "SELECT username FROM users WHERE username = '$userName' ")
+
+# Handle the result if username exist or doesn't
+if [[ -z $USERNAME ]]; then #username doesn't exist
+ #Add username to database
+USERADDED=$($PSQL "INSERT INTO users(username) VALUES('$userName') ")
+echo "Show if username added successfully $USERADDED"
+echo "Welcome, $userName! It looks like this is your first time here."
+else 
+ # get his available info
+GAMES_PLAYED=$($PSQL "SELECT games_played FROM users WHERE username = '$userName'")
+BEST_GAME=$($PSQL "SELECT best_game FROM users WHERE username = '$userName'")
+
+ echo "Welcome back, $userName! You have played $GAMES_PLAYED games, and your best game took $BEST_GAME guesses."
+ fi
 # We produce a random number btn 0 and 1000
 randomNumber=$((RANDOM % 1000 + 1))
 #echo "The random number between 1 and 1000 is: $randomNumber"
@@ -37,4 +53,3 @@ read guessedNumber
 done
 
 echo "You guessed it in $numberOfGuesses tries. The secret number was $randomNumber. Nice job!"
-
