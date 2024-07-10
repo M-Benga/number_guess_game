@@ -11,8 +11,8 @@ USERNAME=$($PSQL "SELECT username FROM users WHERE username = '$userName' ")
 # Handle the result if username exist or doesn't
 if [[ -z $USERNAME ]]; then #username doesn't exist
  #Add username to database
-USERADDED=$($PSQL "INSERT INTO users(username) VALUES('$userName') ")
-echo "Show if username added successfully $USERADDED"
+USERADDED=$($PSQL "INSERT INTO users(username, best_game) VALUES('$userName', 1000) ")
+
 echo "Welcome, $userName! It looks like this is your first time here."
 else 
  # get his available info
@@ -35,6 +35,7 @@ numberOfGuesses=1
 while [ $guessedNumber != $randomNumber ] ; do
 
   if [[ $guessedNumber =~ ^[-+]?[0-9]+$ ]]; then  # Check for valid integer
+
   if [ $guessedNumber -lt $randomNumber ]; then
     echo "It's higher than that, guess again:"
   else
@@ -51,5 +52,17 @@ read guessedNumber
 #echo "You have guessed $numberOfGuesses times." 
 
 done
+
+# Update database after the game
+GAMES_PLAYED=$(( $GAMES_PLAYED + 1 ))
+UPDATE_GAMES=$($PSQL "UPDATE users SET games_played = $GAMES_PLAYED WHERE username = '$userName'")
+
+# get best game for next update
+BEST_GAME=$($PSQL "SELECT best_game FROM users WHERE username = '$userName'")
+
+if [ $numberOfGuesses -lt $BEST_GAME ]; then
+ BEST_GAME=$numberOfGuesses 
+ UPDATE_BEST_GAME=$($PSQL "UPDATE users SET best_game = $BEST_GAME WHERE username = '$userName' ")
+ fi
 
 echo "You guessed it in $numberOfGuesses tries. The secret number was $randomNumber. Nice job!"
